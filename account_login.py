@@ -51,8 +51,11 @@ while not login:
             print("\nInformações preenchidas:\n")
 
             for attribute, value in user_data.items():
+                if attribute in ("saldo_conta", "score_conta", "extrato_conta"):
+                    continue
+
                 if attribute == "user_id":
-                    print(f"Caso a sua conta for criada com sucesso, seu ID será '{value}'. Guarde-o com cuidado, pois ele é exclusivo para cada conta.")
+                    print(f"ATENÇÃO: Caso a sua conta for criada com sucesso, seu ID será '{value}'. Guarde-o com cuidado, pois ele é exclusivo para cada conta.\n")
                     continue
 
                 if attribute == "numero_cpf":
@@ -61,7 +64,7 @@ while not login:
 
                 print(f"{attribute.replace("_", " ").title()}: {value}")
 
-            print()
+            print("\n----------------------------\n")
             options_confirm = ["confirmar", "alterar", "cancelar"]
 
             try:
@@ -83,6 +86,7 @@ while not login:
                 valid_user_password = login_functions.validar_usuario_e_senha(complete_username, password_account)
                 valid_cpf = login_functions.validar_cpf(user_cpf_number)
 
+                print("\n----------------------------")
                 while not valid_cpf:
                     print("\nVerifique seu CPF:")
                     print(f"CPF: {cpf_formatado} (deve conter exatamente 11 dígitos)\n")
@@ -123,11 +127,39 @@ while not login:
                 print("Conta criada com sucesso, faça login para acessá-la!")
                 informations_confirmed = True
             elif confirmation_option_selected == 2:
-                ...  # codar (2. ALTERAR INFORMAÇÕES)
+                basic_functions.limpar_terminal()
+
+                altered_informations = False
+                while not altered_informations:
+                    print("\nPreencha as informações com atenção!\n\n")
+
+                    for attribute, value in user_data.items():
+                        if attribute in ("user_id", "saldo_conta", "score_conta", "extrato_conta"):
+                            continue
+
+                        if attribute == "numero_cpf":
+                            print(f"{attribute.replace("_", " ").title()}: {cpf_formatado}")
+                            continue
+
+                        print(f"{attribute.replace("_", " ").title()}: {value}")
+
+                    print("\n----------------------------\n")
+                    complete_username = input("Digite novamente seu nome completo: ").strip()
+                    user_cpf_number = input("Digite novamente seu CPF: ").strip().replace(".", "").replace("-", "")
+                    password_account = input("Defina novamente sua senha (mínimo 5 caracteres): ").strip()
+
+                    user_data["nome_completo"] = complete_username
+                    user_data["numero_cpf"] = user_cpf_number
+                    user_data["senha"] = password_account
+                    cpf_formatado = login_functions.formatar_cpf(user_cpf_number)
+
+                    print("\nPressione qualquer tecla para continuar\n")
+                    input("")
+                    basic_functions.limpar_terminal()
+                    altered_informations = True
             else:
                 basic_functions.limpar_terminal()
                 break
-
     elif login_option_selected == 2:
         ...  # codar (2. Fazer Login)
         login = True
