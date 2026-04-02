@@ -2,9 +2,11 @@ import functions.login_functions as login_functions
 import functions.basic_functions as basic_functions
 
 
-ARQUIVO_USUARIOS = ".\\base_de_dados\\dados_usuarios.json"
+USERS_FILE = ".\\database\\users_data.json"
+LOGGEDIN_USER_FILE = ".\\database\\loggedin_user_data.json"
+users = login_functions.search_user_data([], USERS_FILE)
+loggedin_user = login_functions.search_user_data([], LOGGEDIN_USER_FILE)
 
-users = login_functions.buscar_dados_usuarios([], ARQUIVO_USUARIOS)
 login = False
 while not login:
     login_options = ["Criar conta", "Fazer login", "Sair"]
@@ -18,40 +20,40 @@ while not login:
         login_option_selected = int(login_option_selected)
 
         if login_option_selected not in range(1, len(login_options) + 1):
-            raise ValueError(basic_functions.exibir_erro_opcao_menu(login_option_selected))
+            raise ValueError(basic_functions.display_error_menu_option(login_option_selected))
 
     except ValueError:
-        basic_functions.limpar_terminal()
-        print(basic_functions.exibir_erro_opcao_menu(login_option_selected))
+        basic_functions.clear_terminal()
+        print(basic_functions.display_error_menu_option(login_option_selected))
         continue
 
     if login_option_selected == 1:
-        basic_functions.limpar_terminal()
+        basic_functions.clear_terminal()
         print("\nCrie sua conta agora mesmo!\n")
 
-        print("Preencha algumas informações para abrir a conta: ")
+        print("Preencha algumas informações para abrir sua conta: ")
         complete_username = input("Digite seu nome completo: ").strip()
         user_cpf_number = input("Digite seu CPF: ").strip().replace(".", "").replace("-", "")
         password_account = input("Defina sua senha (mínimo 5 caracteres): ").strip()
 
         user_data = {}
-        user_data["user_id"] = login_functions.sequencia_id(ARQUIVO_USUARIOS)
+        user_data["user_id"] = login_functions.sequence_id(USERS_FILE)
         user_data["nome_completo"] = complete_username
         user_data["numero_cpf"] = user_cpf_number
-        user_data["saldo_conta"] = 0
-        user_data["score_conta"] = 0
-        user_data["extrato_conta"] = []
+        user_data["account_balance"] = 0
+        user_data["account_score"] = 0
+        user_data["account_statement"] = []
         user_data["senha"] = password_account
-        cpf_formatado = login_functions.formatar_cpf(user_cpf_number)
+        formatted_cpf = login_functions.format_cpf(user_cpf_number)
 
-        basic_functions.limpar_terminal()
+        basic_functions.clear_terminal()
 
         informations_confirmed = False
         while not informations_confirmed:
             print("\nInformações preenchidas:\n")
 
             for attribute, value in user_data.items():
-                if attribute in ("saldo_conta", "score_conta", "extrato_conta"):
+                if attribute in ("account_balance", "account_score", "account_statement"):
                     continue
 
                 if attribute == "user_id":
@@ -59,7 +61,7 @@ while not login:
                     continue
 
                 if attribute == "numero_cpf":
-                    print(f"{attribute.replace("_", " ").title()}: {cpf_formatado}")
+                    print(f"{attribute.replace("_", " ").title()}: {formatted_cpf}")
                     continue
 
                 print(f"{attribute.replace("_", " ").title()}: {value}")
@@ -75,70 +77,71 @@ while not login:
                 confirmation_option_selected = int(confirmation_option_selected)
 
                 if confirmation_option_selected not in range(1, len(options_confirm) + 1):
-                    raise ValueError(basic_functions.exibir_erro_opcao_menu(confirmation_option_selected))
+                    raise ValueError(basic_functions.display_error_menu_option(confirmation_option_selected))
 
             except ValueError:
-                basic_functions.limpar_terminal()
-                print(basic_functions.exibir_erro_opcao_menu(confirmation_option_selected))
+                basic_functions.clear_terminal()
+                print(basic_functions.display_error_menu_option(confirmation_option_selected))
                 continue
 
             if confirmation_option_selected == 1:
-                valid_user_password = login_functions.validar_usuario_e_senha(complete_username, password_account)
-                valid_cpf = login_functions.validar_cpf(user_cpf_number)
+                valid_user_password = login_functions.validate_username_and_password(complete_username, password_account)
+                valid_cpf = login_functions.validate_cpf(user_cpf_number)
 
                 print("\n----------------------------")
                 while not valid_cpf:
                     print("\nVerifique seu CPF:")
-                    print(f"CPF: {cpf_formatado} (deve conter exatamente 11 dígitos)\n")
+                    print(f"CPF: '{formatted_cpf}' (deve conter exatamente 11 dígitos)\n")
 
                     user_cpf_number = input("Digite novamente seu CPF: ").strip().replace(".", "").replace("-", "")
-                    valid_cpf = login_functions.validar_cpf(user_cpf_number)
-                    basic_functions.limpar_terminal()
+                    valid_cpf = login_functions.validate_cpf(user_cpf_number)
+                    basic_functions.clear_terminal()
 
-                    cpf_formatado = login_functions.formatar_cpf(user_cpf_number)
+                    formatted_cpf = login_functions.format_cpf(user_cpf_number)
                     user_data["numero_cpf"] = user_cpf_number
 
                 user_data["numero_cpf"] = valid_cpf
-                user_exists = login_functions.verificar_usuario_existente(users, user_data, ARQUIVO_USUARIOS)
+                user_exists = login_functions.verify_existing_user(users, user_data, USERS_FILE)
 
-                if user_exists:
+                if user_exists is not None:
                     print(f"\nATENÇÃO: Usuário com CPF '{user_data['numero_cpf']}' já cadastrado, não é possível cadastrá-lo novamente.")
-                    input("Pressione ENTER ou qualquer tecla para prosseguir\n\n")
-                    basic_functions.limpar_terminal()
+                    input("\nPressione ENTER ou qualquer tecla para prosseguir\n\n")
+                    basic_functions.clear_terminal()
                     break
 
                 while not valid_user_password:
                     print("\nVerifique seu nome e sua senha:")
-                    print(f"Nome Completo: {user_data['nome_completo']} (deve conter somente letras)")
-                    print(f"Senha: {user_data["senha"]} (deve ter no mínimo 5 caracteres)\n")
+                    print(f"Nome Completo: '{user_data['nome_completo']}' (deve conter letras e somente letras)")
+                    print(f"Senha: '{user_data["senha"]}' (deve ter no mínimo 5 caracteres)\n")
 
                     complete_username = input("Digite novamente seu nome completo: ").strip()
                     password_account = input("Defina novamente sua senha (mínimo 5 caracteres): ").strip()
-                    valid_user_password = login_functions.validar_usuario_e_senha(complete_username, password_account)
-                    basic_functions.limpar_terminal()
+                    valid_user_password = login_functions.validate_username_and_password(complete_username, password_account)
+                    basic_functions.clear_terminal()
 
                 user_data["nome_completo"] = complete_username
                 user_data["senha"] = password_account
 
                 users.append(user_data)
-                login_functions.criar_usuario(users, ARQUIVO_USUARIOS)
-                basic_functions.limpar_terminal()
+                login_functions.create_user(users, USERS_FILE)
+                basic_functions.clear_terminal()
 
-                print("Conta criada com sucesso, faça login para acessá-la!")
+                print("\nConta criada com sucesso, faça login para acessá-la!")
                 informations_confirmed = True
             elif confirmation_option_selected == 2:
-                basic_functions.limpar_terminal()
+                basic_functions.clear_terminal()
 
                 altered_informations = False
                 while not altered_informations:
-                    print("\nPreencha as informações com atenção!\n\n")
+                    print("\nPreencha as informações com atenção!\n")
 
+                    print("Informações atuais:")
                     for attribute, value in user_data.items():
-                        if attribute in ("user_id", "saldo_conta", "score_conta", "extrato_conta"):
+                        if attribute in ("user_id", "account_balance", "account_score", "account_statement"):
                             continue
 
                         if attribute == "numero_cpf":
-                            print(f"{attribute.replace("_", " ").title()}: {cpf_formatado}")
+                            print(f"{attribute.replace("_", " ").title()}: {formatted_cpf}")
                             continue
 
                         print(f"{attribute.replace("_", " ").title()}: {value}")
@@ -151,19 +154,85 @@ while not login:
                     user_data["nome_completo"] = complete_username
                     user_data["numero_cpf"] = user_cpf_number
                     user_data["senha"] = password_account
-                    cpf_formatado = login_functions.formatar_cpf(user_cpf_number)
+                    formatted_cpf = login_functions.format_cpf(user_cpf_number)
 
-                    print("\nPressione qualquer tecla para continuar\n")
-                    input("")
-                    basic_functions.limpar_terminal()
+                    input("\nPressione ENTER ou qualquer tecla para prosseguir\n\n")
+                    basic_functions.clear_terminal()
                     altered_informations = True
             else:
-                basic_functions.limpar_terminal()
+                basic_functions.clear_terminal()
                 break
     elif login_option_selected == 2:
-        ...  # codar (2. Fazer Login)
-        login = True
+        basic_functions.clear_terminal()
+
+        user_cpf_number = input("\nInsira seu CPF para fazer login: ").strip().replace(".", "").replace("-", "")
+        formatted_cpf = login_functions.format_cpf(user_cpf_number)
+        valid_cpf = login_functions.validate_cpf(user_cpf_number)
+
+        while not valid_cpf:
+            print("\n----------------------------")
+            print("\nVerifique seu CPF:")
+            print(f"CPF: '{formatted_cpf}' (deve conter exatamente 11 dígitos)")
+
+            user_cpf_number = input("\nDigite novamente seu CPF: ").strip().replace(".", "").replace("-", "")
+            formatted_cpf = login_functions.format_cpf(user_cpf_number)
+            valid_cpf = login_functions.validate_cpf(user_cpf_number)
+
+        basic_functions.clear_terminal()
+
+        user_exists = False
+        for user in users:
+            if user["numero_cpf"] == valid_cpf:
+                user_data = user
+                user_exists = True
+                break
+
+        if user_exists:
+            print("\nInformações da conta:\n")
+            print(f"ID: {user_data["user_id"]}")
+            print(f"Nome Completo: {user_data["nome_completo"]}")
+            print(f"CPF: {user_data["numero_cpf"]}")
+
+            print("\n----------------------------")
+
+            login_attempts = 1
+            login_attempt_limit = 5
+
+            logged_user = False
+            while not logged_user:
+                if login_attempts <= login_attempt_limit:
+                    print(f"\n{login_attempts}ª tentativa de login (Máximo de tentativas: {login_attempt_limit})\n")
+
+                    input_password = input("Digite sua senha: ").strip()
+                    login_attempts += 1
+                    print("\n----------------------------")
+                else:
+                    print("\nVocê atingiu o limite de tentativas, acesse o menu principal e informe suas credenciais novamente.\n")
+                    input("Pressione ENTER ou qualquer tecla para prosseguir\n\n")
+                    basic_functions.clear_terminal()
+                    break
+
+                if input_password == user_data["senha"]:
+                    loggedin_user.append(user_data)
+                    login_functions.create_user(loggedin_user, LOGGEDIN_USER_FILE)
+                    basic_functions.clear_terminal()
+                    print("\nLogin efetuado com sucesso!")
+                    print("Você será redirecionado ao menu inicial da sua conta.\n")
+
+                    input("Pressione ENTER ou qualquer tecla para prosseguir\n\n")
+                    basic_functions.clear_terminal()
+                    logged_user = True
+
+            login = True if logged_user else login
+        else:
+            print(f"Não há um usuário cadastrado com o CPF '{formatted_cpf}'!")
+            print("Realize seu cadastro no menu inicial.\n")
+
+            input("Pressione ENTER ou qualquer tecla para prosseguir\n\n")
+
+            basic_functions.clear_terminal()
+            continue
     else:
-        basic_functions.limpar_terminal()
+        basic_functions.clear_terminal()
         print("\nSistema encerrado.\n")
         break

@@ -1,8 +1,8 @@
 import os
 
 
-def limpar_terminal():
+def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
-def exibir_erro_opcao_menu(valor_opcao):
-    return f"Opção '{valor_opcao}' inválida, escolha uma opção disponível no menu."
+def display_error_menu_option(option_value):
+    return f"Opção '{option_value}' inválida, escolha uma opção disponível no menu."
