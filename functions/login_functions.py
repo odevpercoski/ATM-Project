@@ -27,8 +27,13 @@ def search_user_data(users_data, JSON_file):
     if not os.path.exists(JSON_file):
         create_user(users_data, JSON_file)
 
+    if "loggedin_user_data.json" in JSON_file:
+        with open(JSON_file, "w+", encoding="utf8") as file:
+            json.dump(users_data, file)
+            return users_data
+
     with open(JSON_file, "r", encoding="utf8") as file:
-        users_data = users_data if ("loggedin_user_data.json" in JSON_file) else json.load(file)
+        users_data = json.load(file)
         return users_data
 
 def sequence_id(JSON_file):

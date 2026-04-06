@@ -1,5 +1,6 @@
-import functions.login_functions as login_functions
 import functions.basic_functions as basic_functions
+import functions.login_functions as login_functions
+import loggedin_account as account_access
 
 
 USERS_FILE = ".\\database\\users_data.json"
@@ -7,8 +8,8 @@ LOGGEDIN_USER_FILE = ".\\database\\loggedin_user_data.json"
 users = login_functions.search_user_data([], USERS_FILE)
 loggedin_user = login_functions.search_user_data([], LOGGEDIN_USER_FILE)
 
-login = False
-while not login:
+open_program = True
+while open_program:
     login_options = ["Criar conta", "Fazer login", "Sair"]
     print("\nBem Vindo(a) ao Caixa Eletrônico\n")
 
@@ -20,7 +21,7 @@ while not login:
         login_option_selected = int(login_option_selected)
 
         if login_option_selected not in range(1, len(login_options) + 1):
-            raise ValueError(basic_functions.display_error_menu_option(login_option_selected))
+            raise ValueError
 
     except ValueError:
         basic_functions.clear_terminal()
@@ -40,10 +41,10 @@ while not login:
         user_data["user_id"] = login_functions.sequence_id(USERS_FILE)
         user_data["nome_completo"] = complete_username
         user_data["numero_cpf"] = user_cpf_number
+        user_data["senha"] = password_account
         user_data["account_balance"] = 0
         user_data["account_score"] = 0
         user_data["account_statement"] = []
-        user_data["senha"] = password_account
         formatted_cpf = login_functions.format_cpf(user_cpf_number)
 
         basic_functions.clear_terminal()
@@ -77,7 +78,7 @@ while not login:
                 confirmation_option_selected = int(confirmation_option_selected)
 
                 if confirmation_option_selected not in range(1, len(options_confirm) + 1):
-                    raise ValueError(basic_functions.display_error_menu_option(confirmation_option_selected))
+                    raise ValueError
 
             except ValueError:
                 basic_functions.clear_terminal()
@@ -223,7 +224,9 @@ while not login:
                     basic_functions.clear_terminal()
                     logged_user = True
 
-            login = True if logged_user else login
+            if logged_user:
+                account_access.control_panel_account(USERS_FILE, LOGGEDIN_USER_FILE, logged_user)
+
         else:
             print(f"Não há um usuário cadastrado com o CPF '{formatted_cpf}'!")
             print("Realize seu cadastro no menu inicial.\n")
@@ -235,4 +238,4 @@ while not login:
     else:
         basic_functions.clear_terminal()
         print("\nSistema encerrado.\n")
-        break
+        open_program = False
