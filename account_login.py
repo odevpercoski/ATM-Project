@@ -22,7 +22,6 @@ while open_program:
 
         if login_option_selected not in range(1, len(login_options) + 1):
             raise ValueError
-
     except ValueError:
         basic_functions.clear_terminal()
         print(basic_functions.display_error_menu_option(login_option_selected))
@@ -79,7 +78,6 @@ while open_program:
 
                 if confirmation_option_selected not in range(1, len(options_confirm) + 1):
                     raise ValueError
-
             except ValueError:
                 basic_functions.clear_terminal()
                 print(basic_functions.display_error_menu_option(confirmation_option_selected))
@@ -226,7 +224,6 @@ while open_program:
 
             if logged_user:
                 account_access.control_panel_account(USERS_FILE, LOGGEDIN_USER_FILE, logged_user)
-
         else:
             print(f"Não há um usuário cadastrado com o CPF '{formatted_cpf}'!")
             print("Realize seu cadastro no menu inicial.\n")
