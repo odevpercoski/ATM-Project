@@ -21,7 +21,7 @@ The system operates with a structured JSON object to support horizontal scalabil
 
 ```bash
 # Clone the repository
-git clone [https://github.com/odevpercoski/ATM-Project](https://github.com/odevpercoski/ATM-Project)
+git clone [https://github.com/odevpercoski/Automated-Teller-Machine](https://github.com/odevpercoski/Automated-Teller-Machine)
 
 # Execute the system entry point
 python account_login.py
