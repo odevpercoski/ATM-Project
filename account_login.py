@@ -5,11 +5,12 @@ import loggedin_account as account_access
 
 USERS_FILE = ".\\database\\users_data.json"
 LOGGEDIN_USER_FILE = ".\\database\\loggedin_user_data.json"
-users = login_functions.search_user_data([], USERS_FILE)
-loggedin_user = login_functions.search_user_data([], LOGGEDIN_USER_FILE)
 
 open_program = True
 while open_program:
+    users = login_functions.search_user_data([], USERS_FILE)
+    loggedin_user = login_functions.search_user_data([], LOGGEDIN_USER_FILE)
+
     login_options = ["Criar conta", "Fazer login", "Sair"]
     print("\nBem Vindo(a) ao Caixa Eletrônico\n")
 
@@ -73,7 +74,7 @@ while open_program:
                 for idx, option in enumerate(options_confirm, 1):
                     print(f"Digite {idx} para {option.upper()}")
 
-                confirmation_option_selected = input("\nOpção escolhida: ")
+                confirmation_option_selected = input("\nOpção escolhida: ").strip()
                 confirmation_option_selected = int(confirmation_option_selected)
 
                 if confirmation_option_selected not in range(1, len(options_confirm) + 1):
@@ -102,7 +103,7 @@ while open_program:
                 user_data["numero_cpf"] = valid_cpf
                 user_exists = login_functions.verify_existing_user(users, user_data, USERS_FILE)
 
-                if user_exists is not None:
+                if user_exists:
                     print(f"\nATENÇÃO: Usuário com CPF '{user_data['numero_cpf']}' já cadastrado, não é possível cadastrá-lo novamente.")
                     input("\nPressione ENTER ou qualquer tecla para prosseguir\n\n")
                     basic_functions.clear_terminal()
@@ -191,7 +192,6 @@ while open_program:
             print(f"ID: {user_data["user_id"]}")
             print(f"Nome Completo: {user_data["nome_completo"]}")
             print(f"CPF: {user_data["numero_cpf"]}")
-
             print("\n----------------------------")
 
             login_attempts = 1
@@ -214,12 +214,14 @@ while open_program:
                 if input_password == user_data["senha"]:
                     loggedin_user.append(user_data)
                     login_functions.create_user(loggedin_user, LOGGEDIN_USER_FILE)
+
                     basic_functions.clear_terminal()
                     print("\nLogin efetuado com sucesso!")
                     print("Você será redirecionado ao menu inicial da sua conta.\n")
-
                     input("Pressione ENTER ou qualquer tecla para prosseguir\n\n")
                     basic_functions.clear_terminal()
+
+                    loggedin_user = []
                     logged_user = True
 
             if logged_user:
@@ -227,7 +229,6 @@ while open_program:
         else:
             print(f"Não há um usuário cadastrado com o CPF '{formatted_cpf}'!")
             print("Realize seu cadastro no menu inicial.\n")
-
             input("Pressione ENTER ou qualquer tecla para prosseguir\n\n")
 
             basic_functions.clear_terminal()

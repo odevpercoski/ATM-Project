@@ -79,3 +79,10 @@ def has_sufficient_balance(loggedin_user_JSON_file, withdraw_value):
 
     current_balance = logged_user_data["account_balance"]
     return True if current_balance >= withdraw_value else False
+
+def has_movements(loggedin_user_JSON_file):
+    with open(loggedin_user_JSON_file, "r", encoding="utf8") as file:
+        logged_user_data = json.load(file)[0]
+
+    current_statement = logged_user_data["account_statement"]
+    return True if current_statement else False

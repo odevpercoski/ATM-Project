@@ -4,11 +4,9 @@ import os
 
 def validate_username_and_password(*args):
     username, password, *_ = args
-
     invalid_username = any(not char.isalpha() for char in username.replace(" ", ""))
     invalid_username = True if not username else invalid_username
     invalid_password = not len(password.strip()) >= 5
-
     return False if (invalid_username or invalid_password) else True
 
 def format_cpf(cpf):
@@ -49,3 +47,4 @@ def verify_existing_user(users_data, user_data, JSON_file):
     for user in users:
         if user["numero_cpf"] == user_data["numero_cpf"]:
             return True
+    return False
